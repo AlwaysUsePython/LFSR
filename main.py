@@ -1,3 +1,5 @@
+import time
+
 class LFSRGenerator4:
 
     def __init__(self, seed='1001'):
@@ -32,7 +34,7 @@ class LFSRGenerator16:
         self.iterations += 1
         return int(self.current[-1])
 
-    def generate(self, start, end):
+    def generateStupid(self, start, end):
         possibilities = []
         for num in range(start, end+1):
             possibilities.append(num)
@@ -51,6 +53,16 @@ class LFSRGenerator16:
 
         return possibilities[0]
 
+    def generateSmart(self, start, end):
+        self.generateBinary()
+        randChoice = (int(self.previous, 2)) % (start-end) + start
+
+        f = open('Seed', 'w')
+        f.write(self.previous)
+        f.close()
+
+        return randChoice
+
     def getOriginalSeed(self):
         return self.seed
 
@@ -61,8 +73,21 @@ rand = LFSRGenerator16()
 
 distribution = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-for i in range(1000):
-    distribution[rand.generate(1, 6) + rand.generate(1, 6)-2] += 1
+start = time.time()
+for i in range(20000):
+    distribution[rand.generateStupid(1, 6) + rand.generateStupid(1, 6)-2] += 1
+end = time.time()
+
+print("The dumb way took " + str(end-start) + " seconds")
+
+start = time.time()
+for i in range(20000):
+    distribution[rand.generateSmart(1, 6) + rand.generateSmart(1, 6)-2] += 1
+end = time.time()
+
+print("The smart way took " + str(end-start) + " seconds")
+
+
 
 print(distribution)
 print(rand.getIterations())
